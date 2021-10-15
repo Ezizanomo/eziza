@@ -1,0 +1,56 @@
+USE mavenfuzzyfactory;
+
+create user 'ez'@'localhost' identified by 'dba24';
+grant all on mavenfuzzyfactory.* to 'ez'@'localhost';
+flush privileges;
+
+show grants for 'ez'@'localhost';
+
+
+
+
+-- to connect to SQL Server and see the server name do the following
+
+SELECT @@ServerName
+
+C:\Users\18038>cd C:\Program Files\MySQL\MySQL Workbench 8.0\
+
+
+
+How to Install MySQL 8.0 Server on Linux CentOS  explains all the steps you need o take to install MySQL 8.0 Server on CentOS.
+
+1) Download and add MySQL Yum Repository to Linux Repository
+
+sudo wget https://repo.mysql.com/mysql80-commun...
+
+
+
+2) Install the downloaded package by using below command
+
+sudo yum localinstall mysql80-community-release-el7-1.noarch.rpm
+
+
+
+3) Verify that the MySQL Yum repository has been added successfully
+
+sudo yum repolist enabled | grep "mysql.*-community.*"
+
+
+
+4) Install latest MySQL
+
+sudo yum install mysql-community-server
+
+
+
+5) Start MySQL Server
+
+sudo service mysqld start
+
+sudo systemctl status mysqld
+
+6) Secure MySQL Server
+When MySQL 8.0 version is installed, temporary password for root is created
+grep 'temporary password' /var/log/mysqld.log
+get the password and then run below command.
+mysql_secure_installation
