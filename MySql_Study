@@ -1,0 +1,60 @@
+--Users and Privileges
+--Display the current user name and hostname:
+USER()
+
+--Create a MySQL user:
+CREATE USER 'user'@'host';
+
+--Grant a specified type of privilege to a user on an object:
+GRANT privileges_name ON object TO user;
+
+--Set a password for the current user:
+SET PASSWORD='password'
+
+CREATE DATABASE database_name;
+
+USE database_name;
+
+DROP DATABASE database_name;
+
+--List all databases on the MySQL server:
+SHOW DATABASES;
+
+--List all MySQL users:
+SELECT user FROM mysql.user;
+
+--Working With Tables in MySQL
+CREATE TABLE table_name (
+    column1 datatype,
+    column2 datatype,
+    column3 datatype,
+);
+
+--Display the table structure:
+DESCRIBE table_name
+
+DROP TABLE table_name;
+
+ALTER TABLE table_name
+ADD column_name datatype;
+
+SELECT * FROM table_name;
+
+--Working With Indexes in MySQL
+--Create an index for a table:
+CREATE INDEX index_name
+ON table_name (column1, column2, ...);
+
+--Delete an index from a table:
+ALTER TABLE table_name
+DROP INDEX index_name;
+
+--Working With Views in MySQL
+--Create a view (virtual table) with the specified content:
+CREATE VIEW view_name AS
+SELECT column1, column2, ...
+FROM table_name
+WHERE condition;
+
+--Delete a view:
+DROP VIEW view_name;
