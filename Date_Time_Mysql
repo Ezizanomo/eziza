@@ -1,0 +1,38 @@
+Objectives
+Successfully complete this lab by achieving the following learning objectives:
+Log into the MySQL Server as the `root` User and Change to the **prod** Database
+Login to the MySQL server:
+
+[cloud_user@host]$ mysql -u root -p
+Change to the prod database:
+
+mysql> USE prod;
+Insert the List of Dates Provided in the Instructions into the `date` Column
+Run the following statement to insert the dates into the date column:
+
+mysql> INSERT INTO records (date) VALUES ('1989-02-23'), ('17-12-01'), ('19851210'), ('19:06:04');
+Insert the List of Times Provided in the Instructions into the `time` Column
+Use the following statement to insert the times into the time column:
+
+mysql> INSERT INTO records (time) VALUES ('12:20:45'), ('08:15'), (2247), ('11:25:08.778');
+Insert the List of Dates and Times Provided in the Instructions into the `datetime` Column
+Run the following command to insert the list of dates and times into the datetime column:
+
+mysql> INSERT INTO records (datetime) VALUES ('2015:07:13 04-22-47'), (120804100712);
+Insert the List of Dates and Times Provided in the Instructions into the `timestamp` Column
+Run the following command to insert the list of dates and times into the timestamp column:
+
+mysql> INSERT INTO records (timestamp) VALUES ('19890905071153'), ('2004;05;26 02,45,03');
+After Setting a Baseline Timezone of `+00:00`, Update the Time Zone by `+03:00` Hours and See Its Effect on the `datetime` and `timestamp` Columns
+Establish a baseline timezone:
+
+msyql> set time_zone = '+00:00';
+List the data in the records table prior to updating the timezone to +03:00:
+
+mysql> select * from records;
+Update the timezone by +03:00 hours:
+
+msyql> set time_zone = '+03:00';
+List the data in the records table and notice the change to the timestamp column:
+
+mysql> select * from records;
