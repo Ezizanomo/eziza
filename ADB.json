@@ -38,22 +38,22 @@
       "vnetRG": {
         "type": "String",
         "defaultValue" : "rg-dataplatform-prd-001"
-      },
+     },
       "publicSubnetName": {
         "type": "String",
-        "defaultValue" : "snet-dataplatform-dbw-pub-prd"
+        "defaultValue" : "snet-dataplatform-dbw-pub-prd1"
       },
       "publicSubnetCIDR": {
         "type": "String",
-        "defaultValue" : "10.100.1.100/26"
+        "defaultValue" : "10.0.111.0/25"
       },
       "privateSubnetName": {
         "type": "String",
-        "defaultValue" : "snet-dataplatform-dbw-pri-prd"
+        "defaultValue" : "snet-dataplatform-dbw-pri-prd1"
       },
       "privateSubnetCIDR": {
         "type": "String",
-        "defaultValue" : "10.100.1.10/26"
+        "defaultValue" : "10.0.105.0/25"
       }
     },
     "variables": {
