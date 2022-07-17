@@ -1,0 +1,169 @@
+
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "location": {
+        "type": "String",
+        "defaultValue" : "eastus"
+      },
+      "workspaceName": {
+        "type": "String",
+        "defaultValue" : "dbw-dataplatform-prd-001"
+      },
+      "tier": {
+        "type": "String",
+        "defaultValue": "premium"
+      },
+      "enableNoPublicIp": {
+        "type": "Bool",
+        "defaultValue": true
+      },
+      "requireInfrastructureEncryption": {
+        "type": "Bool",
+        "defaultValue": true
+      },
+      "managedResourceGroupName": {
+        "type": "String",
+        "defaultValue" : "mrg-dbw-dataplatform-prd-001"
+      },
+      "nsgName": {
+          "type": "String",
+          "defaultValue" : "nsg-dbw-prd-001"
+      },
+      "vnetName": {
+        "type": "String",
+        "defaultValue" : "vnet-dataplatform-prd-001"
+      },
+      "vnetRG": {
+        "type": "String",
+        "defaultValue" : "rg-dataplatform-prd-001"
+      },
+      "publicSubnetName": {
+        "type": "String",
+        "defaultValue" : "snet-dataplatform-dbw-pub-prd"
+      },
+      "publicSubnetCIDR": {
+        "type": "String",
+        "defaultValue" : "10.100.1.100/26"
+      },
+      "privateSubnetName": {
+        "type": "String",
+        "defaultValue" : "snet-dataplatform-dbw-pri-prd"
+      },
+      "privateSubnetCIDR": {
+        "type": "String",
+        "defaultValue" : "10.100.1.10/26"
+      }
+    },
+    "variables": {
+      "managedResourceGroupId": "[concat(subscription().id, '/resourceGroups/', parameters('managedResourceGroupName'))]",
+      "vnetId": "[concat(subscription().id, '/resourceGroups/', parameters('vnetRG'), '/providers/Microsoft.Network/virtualNetworks/', parameters('vnetName'))]",
+      "nsgId": "[concat(subscription().id, '/resourceGroups/', parameters('vnetRG'), '/providers/Microsoft.Network/networkSecurityGroups/', parameters('nsgName'))]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Databricks/workspaces",
+        "apiVersion": "2018-04-01",
+        "name": "[parameters('workspaceName')]",
+        "location": "[parameters('location')]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkSecurityGroups/', parameters('nsgName'))]",
+          "['Microsoft.Resources/deployments/nestedTemplate']"
+        ],
+        "sku": {
+          "name": "[parameters('tier')]"
+        },
+        "properties": {
+          "ManagedResourceGroupId": "[variables('managedResourceGroupId')]",
+          "parameters": {
+            "enableNoPublicIp": {
+              "value": "[parameters('enableNoPublicIp')]"
+            },
+            "requireInfrastructureEncryption": {
+              "value": "[parameters('requireInfrastructureEncryption')]"
+            },
+            "customVirtualNetworkId": {
+              "value": "[variables('vnetId')]"
+            },
+            "customPublicSubnetName": {
+              "value": "[parameters('publicSubnetName')]"
+            },
+            "customPrivateSubnetName": {
+              "value": "[parameters('privateSubnetName')]"
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkSecurityGroups",
+        "apiVersion": "2019-06-01",
+        "name": "[parameters('nsgName')]",
+        "location": "[parameters('location')]"
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2017-05-10",
+        "name": "nestedTemplate",
+        "dependsOn": [
+          "[concat('Microsoft.Network/networkSecurityGroups/', parameters('nsgName'))]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "template": {
+            "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {},
+            "variables": {},
+            "resources": [
+              {
+                "apiVersion": "2019-06-01",
+                "type": "Microsoft.Network/virtualNetworks/subnets",
+                "name": "[concat(parameters('vnetName'), '/', parameters('publicSubnetName'))]",
+                "location": "[parameters('location')]",
+                "properties": {
+                  "addressPrefix": "[parameters('publicSubnetCIDR')]",
+                  "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                  },
+                  "delegations": [
+                    {
+                      "name": "[concat('databricks-del-', uniqueString(parameters('publicSubnetName')))]",
+                      "properties": {
+                        "serviceName": "Microsoft.Databricks/workspaces"
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "apiVersion": "2019-06-01",
+                "type": "Microsoft.Network/virtualNetworks/subnets",
+                "name": "[concat(parameters('vnetName'), '/', parameters('privateSubnetName'))]",
+                "location": "[parameters('location')]",
+                "dependsOn": [
+                  "[concat('Microsoft.Network/virtualNetworks/', parameters('vnetName'), '/subnets/', parameters('publicSubnetName'))]"
+                ],
+                "properties": {
+                  "addressPrefix": "[parameters('privateSubnetCIDR')]",
+                  "networkSecurityGroup": {
+                    "id": "[variables('nsgId')]"
+                  },
+                  "delegations": [
+                    {
+                      "name": "[concat('databricks-del-', uniqueString(parameters('privateSubnetName')))]",
+                      "properties": {
+                        "serviceName": "Microsoft.Databricks/workspaces"
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "parameters": {}
+        },
+        "resourceGroup": "[parameters('vnetRG')]"
+      }
+    ]
+  }
